@@ -19,3 +19,22 @@
 
 # Go workspace file
 go.work
+
+# Configuration files
+.idea/
+.vscode/
+
+# Compiled files
+*.o
+*.obj
+
+# Go dependencies
+/bin/
+/pkg/
+/vendor/
+
+# Environment files
+.env
+
+# Log files
+*.log
