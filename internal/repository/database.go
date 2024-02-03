@@ -11,7 +11,7 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDB() {
+func ConnectDB() *gorm.DB {
 	dsn := "host=" + os.Getenv("DB_HOST") + " user=" + os.Getenv("DB_USER") + " password=" + os.Getenv("DB_PASSWORD") + " dbname=" + os.Getenv("DB_NAME") + " port=" + os.Getenv("DB_PORT") + " sslmode=disable"
 
 	var db *gorm.DB
@@ -30,6 +30,7 @@ func ConnectDB() {
 	}
 
 	DB = db
+	return db
 }
 
 func CloseDB() {
