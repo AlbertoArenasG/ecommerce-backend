@@ -79,3 +79,27 @@ func (ph *ProductHandler) EditProduct(c *fiber.Ctx) error {
 
 	return c.JSON(successResponse)
 }
+
+func (ph *ProductHandler) DeleteProduct(c *fiber.Ctx) error {
+	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+	if err != nil {
+		ph.logger.WithError(err).Error("Invalid product ID")
+		return c.Status(http.StatusBadRequest).JSON(&response.ErrorResponse{
+			Success: false,
+			Message: "Invalid product ID",
+			Error:   err.Error(),
+		})
+	}
+
+	successResponse, errorResponse := ph.productService.DeleteProductByID(uint(id))
+
+	if errorResponse != nil {
+		statusCode := http.StatusInternalServerError
+		if errorResponse.Message == "Product not found" {
+			statusCode = http.StatusNotFound
+		}
+		return c.Status(statusCode).JSON(errorResponse)
+	}
+
+	return c.JSON(successResponse)
+}

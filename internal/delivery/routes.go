@@ -30,5 +30,5 @@ func SetupRoutes(app *fiber.App, productService *service.ProductService, logger 
 	// Products routes
 	app.Post("/products", productHandler.CreateProduct)
 	app.Put("/products/:id", productHandler.EditProduct)
-	app.Delete("/products/:id", productHandler.CreateProduct)
+	app.Delete("/products/:id", productHandler.DeleteProduct)
 }
