@@ -12,6 +12,7 @@ import (
 
 func SetupRoutes(app *fiber.App, productService *service.ProductService, shoppingCartService *service.ShoppingCartService, logger *logrus.Logger) {
 	productHandler := NewProductHandler(productService, logger)
+	shoppingCartHandler := NewShoppingCartHandler(shoppingCartService, logger)
 
 	app.Get("/health", func(c *fiber.Ctx) error {
 		if err := repository.DB.Exec("SELECT 1").Error; err != nil {
@@ -33,4 +34,8 @@ func SetupRoutes(app *fiber.App, productService *service.ProductService, shoppin
 	app.Post("/products", productHandler.CreateProduct)
 	app.Put("/products/:id", productHandler.EditProduct)
 	app.Delete("/products/:id", productHandler.DeleteProduct)
+
+	// Shopping Carts routes
+	app.Put("/shopping-carts/item", shoppingCartHandler.AddItemToCart)
+
 }
