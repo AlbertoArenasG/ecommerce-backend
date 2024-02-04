@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS shopping_carts (
     is_deleted BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE IF NOT EXISTS shopping_carts_items (
+CREATE TABLE IF NOT EXISTS shopping_cart_items (
     cart_id INT,
     product_id INT,
     quantity INT DEFAULT 1,
