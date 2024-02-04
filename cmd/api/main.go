@@ -25,10 +25,12 @@ func main() {
 
 	productRepository := repository.NewProductRepository(db)
 	productService := service.NewProductService(productRepository, logger)
+	shoppingCartRepository := repository.NewShoppingCartRepository(db)
+	shoppingCartService := service.NewShoppingCartService(shoppingCartRepository, logger)
 
 	app := fiber.New()
 
-	delivery.SetupRoutes(app, productService, logger)
+	delivery.SetupRoutes(app, productService, shoppingCartService, logger)
 
 	port := os.Getenv("PORT")
 	if port == "" {

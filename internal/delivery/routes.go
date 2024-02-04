@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func SetupRoutes(app *fiber.App, productService *service.ProductService, logger *logrus.Logger) {
+func SetupRoutes(app *fiber.App, productService *service.ProductService, shoppingCartService *service.ShoppingCartService, logger *logrus.Logger) {
 	productHandler := NewProductHandler(productService, logger)
 
 	app.Get("/health", func(c *fiber.Ctx) error {
