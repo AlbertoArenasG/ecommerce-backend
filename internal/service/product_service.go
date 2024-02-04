@@ -22,6 +22,22 @@ func NewProductService(pr *repository.ProductRepository, logger *logrus.Logger) 
 	}
 }
 
+func (ps *ProductService) GetProductDetailByID(id uint) (*response.SuccessResponse, *response.ErrorResponse) {
+	product, errorResponse := ps.getProductByID(id)
+	if errorResponse != nil {
+		return nil, errorResponse
+	}
+
+	ps.logger.Info("Get Product detail successfully")
+
+	successResponse := &response.SuccessResponse{
+		Success: true,
+		Data:    product,
+	}
+
+	return successResponse, nil
+}
+
 func (ps *ProductService) AddProduct(product *domain.Product) (*response.SuccessResponse, *response.ErrorResponse) {
 	if err := ps.validateProductData(product); err != nil {
 		return nil, &response.ErrorResponse{

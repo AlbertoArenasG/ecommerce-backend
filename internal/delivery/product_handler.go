@@ -23,6 +23,29 @@ func NewProductHandler(ps *service.ProductService, logger *logrus.Logger) *Produ
 	}
 }
 
+func (ph *ProductHandler) GetProductByID(c *fiber.Ctx) error {
+	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+	if err != nil {
+		ph.logger.WithError(err).Error("Invalid product ID")
+		return c.Status(http.StatusBadRequest).JSON(&response.ErrorResponse{
+			Success: false,
+			Message: "Invalid product ID",
+			Error:   err.Error(),
+		})
+	}
+
+	successResponse, errorResponse := ph.productService.GetProductDetailByID(uint(id))
+	if errorResponse != nil {
+		statusCode := http.StatusInternalServerError
+		if errorResponse.Message == "Product not found" {
+			statusCode = http.StatusNotFound
+		}
+		return c.Status(statusCode).JSON(errorResponse)
+	}
+
+	return c.JSON(successResponse)
+}
+
 func (ph *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 	var product domain.Product
 	if err := c.BodyParser(&product); err != nil {
