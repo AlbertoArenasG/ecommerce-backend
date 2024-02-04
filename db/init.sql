@@ -7,3 +7,6 @@ CREATE TABLE IF NOT EXISTS products (
     image_url TEXT,
     description TEXT
 );
+
+ALTER TABLE products
+ADD COLUMN is_deleted BOOLEAN NOT NULL DEFAULT false;

@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/AlbertoArenasG/ecommerce-backend/internal/delivery/response"
 	"github.com/AlbertoArenasG/ecommerce-backend/internal/domain"
@@ -43,4 +44,38 @@ func (ph *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 	}
 
 	return c.Status(http.StatusCreated).JSON(successResponse)
+}
+
+func (ph *ProductHandler) EditProduct(c *fiber.Ctx) error {
+	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+	if err != nil {
+		ph.logger.WithError(err).Error("Invalid product ID")
+		return c.Status(http.StatusBadRequest).JSON(&response.ErrorResponse{
+			Success: false,
+			Message: "Invalid product ID",
+			Error:   err.Error(),
+		})
+	}
+
+	var updatedProduct domain.Product
+	if err := c.BodyParser(&updatedProduct); err != nil {
+		ph.logger.WithError(err).Error("Invalid request body")
+		return c.Status(http.StatusBadRequest).JSON(&response.ErrorResponse{
+			Success: false,
+			Message: "Invalid request body",
+			Error:   err.Error(),
+		})
+	}
+
+	successResponse, errorResponse := ph.productService.EditProduct(uint(id), &updatedProduct)
+
+	if errorResponse != nil {
+		statusCode := http.StatusInternalServerError
+		if errorResponse.Message == "Product not found" {
+			statusCode = http.StatusNotFound
+		}
+		return c.Status(statusCode).JSON(errorResponse)
+	}
+
+	return c.JSON(successResponse)
 }

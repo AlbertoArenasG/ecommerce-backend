@@ -6,4 +6,5 @@ type Product struct {
 	Price       float64 `json:"price" validate:"required,min=0"`
 	ImageURL    string  `json:"image_url"`
 	Description string  `json:"description"`
+	IsDeleted   bool    `json:"is_deleted,omitempty" gorm:"default:false"`
 }
