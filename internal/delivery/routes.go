@@ -28,6 +28,7 @@ func SetupRoutes(app *fiber.App, productService *service.ProductService, logger 
 	})
 
 	// Products routes
+	app.Get("/products", productHandler.GetProducts)
 	app.Get("/products/:id", productHandler.GetProductByID)
 	app.Post("/products", productHandler.CreateProduct)
 	app.Put("/products/:id", productHandler.EditProduct)

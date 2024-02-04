@@ -23,6 +23,30 @@ func NewProductHandler(ps *service.ProductService, logger *logrus.Logger) *Produ
 	}
 }
 
+func (ph *ProductHandler) GetProducts(c *fiber.Ctx) error {
+	sortField := c.Query("sortField")
+	sortOrder := c.Query("sortOrder")
+	searchQuery := c.Query("search")
+	page, _ := strconv.Atoi(c.Query("page"))
+	limit, _ := strconv.Atoi(c.Query("limit"))
+
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 10
+	} else if limit > 100 {
+		limit = 100
+	}
+
+	successResponse, errorResponse := ph.productService.GetProducts(sortField, sortOrder, searchQuery, page, limit)
+	if errorResponse != nil {
+		return c.Status(http.StatusInternalServerError).JSON(errorResponse)
+	}
+
+	return c.JSON(successResponse)
+}
+
 func (ph *ProductHandler) GetProductByID(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {

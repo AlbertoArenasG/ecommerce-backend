@@ -29,3 +29,31 @@ func (pr *ProductRepository) GetProductByID(id uint) (*domain.Product, error) {
 func (pr *ProductRepository) UpdateProduct(product *domain.Product) error {
 	return pr.db.Save(product).Error
 }
+
+func (pr *ProductRepository) GetProducts(sortField, sortOrder, searchQuery string, page, limit int) ([]domain.Product, int, error) {
+	var products []domain.Product
+	var totalProducts int64
+
+	query := pr.db.Model(&domain.Product{}).Where("is_deleted = ?", false)
+
+	if searchQuery != "" {
+		query = query.Where("name LIKE ?", "%"+searchQuery+"%")
+	}
+
+	err := query.Count(&totalProducts).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if sortField != "" {
+		query = query.Order(sortField + " " + sortOrder)
+	}
+
+	offset := (page - 1) * limit
+	err = query.Offset(offset).Limit(limit).Find(&products).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return products, int(totalProducts), nil
+}

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"math"
+
 	"github.com/AlbertoArenasG/ecommerce-backend/internal/delivery/response"
 	"github.com/AlbertoArenasG/ecommerce-backend/internal/domain"
 	"github.com/AlbertoArenasG/ecommerce-backend/internal/repository"
@@ -20,6 +22,46 @@ func NewProductService(pr *repository.ProductRepository, logger *logrus.Logger) 
 		validator:         validator.New(),
 		logger:            logger,
 	}
+}
+
+func (ps *ProductService) GetProducts(sortField, sortOrder, searchQuery string, page, limit int) (*response.SuccessListResponse, *response.ErrorResponse) {
+	var products []domain.Product
+
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 10
+	} else if limit > 100 {
+		limit = 100
+	}
+
+	products, totalProducts, err := ps.productRepository.GetProducts(sortField, sortOrder, searchQuery, page, limit)
+	if err != nil {
+		ps.logger.WithError(err).Error("Failed to get products")
+		return nil, &response.ErrorResponse{
+			Success: false,
+			Message: "Failed to get products",
+		}
+	}
+
+	ps.logger.Info("Get product list successfully")
+
+	totalPages := int(math.Ceil(float64(totalProducts) / float64(limit)))
+
+	successResponse := &response.SuccessListResponse{
+		Success: true,
+		Message: "Products retrieved successfully",
+		Data:    products,
+		Meta: response.Pagination{
+			TotalRecords: totalProducts,
+			Page:         page,
+			PageSize:     limit,
+			TotalPages:   totalPages,
+		},
+	}
+
+	return successResponse, nil
 }
 
 func (ps *ProductService) GetProductDetailByID(id uint) (*response.SuccessResponse, *response.ErrorResponse) {
