@@ -25,11 +25,28 @@ func (r *ShoppingCartRepository) AddProductToCart(item *domain.ShoppingCartItem)
 	var existingItem domain.ShoppingCartItem
 	result := r.db.Where("cart_id = ? AND product_id = ?", item.CartID, item.ProductID).First(&existingItem)
 	if result.RowsAffected > 0 {
-		existingItem.Quantity += item.Quantity
-		return r.db.Save(&existingItem).Error
+		existingItem.Quantity = item.Quantity
+		return r.db.Where("cart_id = ? AND product_id = ?", item.CartID, item.ProductID).Save(&existingItem).Error
 	}
 
 	return r.db.Create(item).Error
+}
+
+func (r *ShoppingCartRepository) GetCartContents(cartID uint) (*domain.ShoppingCart, error) {
+	var cart domain.ShoppingCart
+	if err := r.db.Preload("Items.Product").First(&cart, cartID).Error; err != nil {
+		return nil, err
+	}
+
+	filteredItems := make([]domain.ShoppingCartItem, 0)
+	for _, item := range cart.Items {
+		if !item.Product.IsDeleted {
+			filteredItems = append(filteredItems, item)
+		}
+	}
+	cart.Items = filteredItems
+
+	return &cart, nil
 }
 
 func (r *ShoppingCartRepository) CheckProductAndCartExistence(productID, cartID uint) (bool, bool, error) {

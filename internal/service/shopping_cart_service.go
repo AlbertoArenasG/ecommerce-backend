@@ -22,6 +22,30 @@ func NewShoppingCartService(scr *repository.ShoppingCartRepository, logger *logr
 	}
 }
 
+func (s *ShoppingCartService) GetCartContents(cartID uint) (*response.SuccessResponse, *response.ErrorResponse) {
+	cart, err := s.shoppingCartRepository.GetCartContents(cartID)
+
+	if err != nil {
+		s.logger.WithError(err).Error("Failed to get cart", err)
+		return nil, &response.ErrorResponse{
+			Success: false,
+			Message: "Cart not found",
+		}
+	}
+
+	cartData := &domain.ShoppingCartResponse{
+		ID:    cart.ID,
+		Items: cart.Items,
+	}
+
+	successResponse := &response.SuccessResponse{
+		Success: true,
+		Data:    cartData,
+	}
+
+	return successResponse, nil
+}
+
 func (s *ShoppingCartService) CreateCart() (*response.SuccessResponse, *response.ErrorResponse) {
 	cart, err := s.shoppingCartRepository.CreateShoppingCart()
 

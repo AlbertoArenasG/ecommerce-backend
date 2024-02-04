@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/AlbertoArenasG/ecommerce-backend/internal/delivery/response"
 	"github.com/AlbertoArenasG/ecommerce-backend/internal/domain"
@@ -20,6 +21,30 @@ func NewShoppingCartHandler(scs *service.ShoppingCartService, logger *logrus.Log
 		shoppingCartService: scs,
 		logger:              logger,
 	}
+}
+
+func (h *ShoppingCartHandler) GetCartContents(c *fiber.Ctx) error {
+	cartID := c.Params("id")
+	id, err := strconv.ParseUint(cartID, 10, 32)
+	if err != nil {
+		h.logger.WithError(err).Error("Invalid cart ID")
+		return c.Status(http.StatusBadRequest).JSON(&response.ErrorResponse{
+			Success: false,
+			Message: "Invalid cart ID",
+			Error:   err.Error(),
+		})
+	}
+
+	successResponse, errorResponse := h.shoppingCartService.GetCartContents(uint(id))
+	if errorResponse != nil {
+		statusCode := http.StatusInternalServerError
+		if errorResponse.Message == "Cart not found" {
+			statusCode = http.StatusNotFound
+		}
+		return c.Status(statusCode).JSON(errorResponse)
+	}
+
+	return c.Status(http.StatusOK).JSON(successResponse)
 }
 
 func (h *ShoppingCartHandler) CreateCart(c *fiber.Ctx) error {
