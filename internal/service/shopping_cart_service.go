@@ -68,7 +68,7 @@ func (s *ShoppingCartService) CreateCart() (*response.SuccessResponse, *response
 }
 
 func (s *ShoppingCartService) AddItemToCart(item *domain.ShoppingCartItem) (*response.SuccessResponse, *response.ErrorResponse) {
-	if err := s.validator.Struct(item); err != nil {
+	if err := s.validator.Var(item.Quantity, "required,min=1"); err != nil {
 		s.logger.WithError(err).Error("Validation failed for quantity")
 		return nil, &response.ErrorResponse{
 			Success: false,
@@ -109,6 +109,47 @@ func (s *ShoppingCartService) AddItemToCart(item *domain.ShoppingCartItem) (*res
 	}
 
 	s.logger.Info("Product added to cart successfully")
+
+	successResponse := &response.SuccessResponse{
+		Success: true,
+	}
+
+	return successResponse, nil
+}
+
+func (s *ShoppingCartService) RemoveItemFromCart(cartID uint, productID uint) (*response.SuccessResponse, *response.ErrorResponse) {
+	productExists, cartExists, err := s.shoppingCartRepository.CheckProductAndCartExistence(productID, cartID)
+	if err != nil {
+		s.logger.WithError(err).Error("Failed to remove product from cart")
+		return nil, &response.ErrorResponse{
+			Success: false,
+			Message: "Failed to remove product from cart",
+		}
+	}
+
+	if !productExists {
+		return nil, &response.ErrorResponse{
+			Success: false,
+			Message: "Product not found",
+		}
+	}
+
+	if !cartExists {
+		return nil, &response.ErrorResponse{
+			Success: false,
+			Message: "Shopping cart not found",
+		}
+	}
+
+	if err := s.shoppingCartRepository.RemoveProductFromCart(cartID, productID); err != nil {
+		s.logger.WithError(err).Error("Failed to remove product from cart")
+		return nil, &response.ErrorResponse{
+			Success: false,
+			Message: "Failed to remove product from cart",
+		}
+	}
+
+	s.logger.Info("Product removed from cart successfully")
 
 	successResponse := &response.SuccessResponse{
 		Success: true,

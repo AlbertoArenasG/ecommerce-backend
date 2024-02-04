@@ -11,7 +11,7 @@ type ShoppingCart struct {
 
 type ShoppingCartItem struct {
 	CartID    uint    `json:"cart_id"`
-	Product   Product `json:"product"`
+	Product   Product `json:"product,omitempty"`
 	ProductID uint    `json:"product_id"`
 	Quantity  int     `json:"quantity"`
 }

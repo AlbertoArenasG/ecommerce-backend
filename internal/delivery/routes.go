@@ -38,6 +38,7 @@ func SetupRoutes(app *fiber.App, productService *service.ProductService, shoppin
 	// Shopping Carts routes
 	app.Get("/shopping-carts/:id", shoppingCartHandler.GetCartContents)
 	app.Post("/shopping-carts", shoppingCartHandler.CreateCart)
-	app.Put("/shopping-carts/item", shoppingCartHandler.AddItemToCart)
+	app.Put("/shopping-carts/items", shoppingCartHandler.AddItemToCart)
+	app.Delete("/shopping-carts/items/:cartID/:productID", shoppingCartHandler.RemoveItemFromCart)
 
 }

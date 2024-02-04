@@ -49,6 +49,10 @@ func (r *ShoppingCartRepository) GetCartContents(cartID uint) (*domain.ShoppingC
 	return &cart, nil
 }
 
+func (r *ShoppingCartRepository) RemoveProductFromCart(cartID, productID uint) error {
+	return r.db.Delete(&domain.ShoppingCartItem{}, "cart_id = ? AND product_id = ?", cartID, productID).Error
+}
+
 func (r *ShoppingCartRepository) CheckProductAndCartExistence(productID, cartID uint) (bool, bool, error) {
 	var productCount, cartCount int64
 	err := r.db.Model(&domain.Product{}).Where("id = ? AND is_deleted = ?", productID, false).Count(&productCount).Error

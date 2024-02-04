@@ -82,3 +82,36 @@ func (h *ShoppingCartHandler) AddItemToCart(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusOK).JSON(successResponse)
 }
+
+func (h *ShoppingCartHandler) RemoveItemFromCart(c *fiber.Ctx) error {
+	cartIDStr := c.Params("cartID")
+	productIDStr := c.Params("productID")
+
+	cartID, err := strconv.ParseUint(cartIDStr, 10, 32)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(&response.ErrorResponse{
+			Success: false,
+			Message: "Invalid cartID",
+		})
+	}
+
+	productID, err := strconv.ParseUint(productIDStr, 10, 32)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(&response.ErrorResponse{
+			Success: false,
+			Message: "Invalid productID",
+		})
+	}
+
+	successResponse, errorResponse := h.shoppingCartService.RemoveItemFromCart(uint(cartID), uint(productID))
+
+	if errorResponse != nil {
+		statusCode := http.StatusInternalServerError
+		if errorResponse.Message == "Validation failed" {
+			statusCode = http.StatusBadRequest
+		}
+		return c.Status(statusCode).JSON(errorResponse)
+	}
+
+	return c.Status(http.StatusOK).JSON(successResponse)
+}
