@@ -22,6 +22,16 @@ func NewShoppingCartHandler(scs *service.ShoppingCartService, logger *logrus.Log
 	}
 }
 
+func (h *ShoppingCartHandler) CreateCart(c *fiber.Ctx) error {
+	successResponse, errorResponse := h.shoppingCartService.CreateCart()
+
+	if errorResponse != nil {
+		return c.Status(http.StatusInternalServerError).JSON(errorResponse)
+	}
+
+	return c.Status(http.StatusCreated).JSON(successResponse)
+}
+
 func (h *ShoppingCartHandler) AddItemToCart(c *fiber.Ctx) error {
 	var item domain.ShoppingCartItem
 	if err := c.BodyParser(&item); err != nil {

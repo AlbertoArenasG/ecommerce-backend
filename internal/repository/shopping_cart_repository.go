@@ -13,6 +13,14 @@ func NewShoppingCartRepository(db *gorm.DB) *ShoppingCartRepository {
 	return &ShoppingCartRepository{db}
 }
 
+func (r *ShoppingCartRepository) CreateShoppingCart() (*domain.ShoppingCart, error) {
+	cart := &domain.ShoppingCart{}
+	if err := r.db.Create(cart).Error; err != nil {
+		return nil, err
+	}
+	return cart, nil
+}
+
 func (r *ShoppingCartRepository) AddProductToCart(item *domain.ShoppingCartItem) error {
 	var existingItem domain.ShoppingCartItem
 	result := r.db.Where("cart_id = ? AND product_id = ?", item.CartID, item.ProductID).First(&existingItem)

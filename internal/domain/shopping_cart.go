@@ -5,8 +5,8 @@ import "time"
 type ShoppingCart struct {
 	ID        uint               `json:"id"`
 	CreatedAt time.Time          `json:"created_at"`
-	IsDeleted bool               `json:"is_deleted"`
-	Items     []ShoppingCartItem `json:"items" gorm:"foreignKey:CartID"`
+	IsDeleted bool               `json:"is_deleted,omitempty"`
+	Items     []ShoppingCartItem `json:"items,omitempty" gorm:"foreignKey:CartID"`
 }
 
 type ShoppingCartItem struct {

@@ -22,6 +22,27 @@ func NewShoppingCartService(scr *repository.ShoppingCartRepository, logger *logr
 	}
 }
 
+func (s *ShoppingCartService) CreateCart() (*response.SuccessResponse, *response.ErrorResponse) {
+	cart, err := s.shoppingCartRepository.CreateShoppingCart()
+
+	if err != nil {
+		s.logger.WithError(err).Error("Failed to create cart", err)
+		return nil, &response.ErrorResponse{
+			Success: false,
+			Message: "Failed to create cart",
+		}
+	}
+
+	s.logger.Info("Cart created successfully ", cart)
+
+	successResponse := &response.SuccessResponse{
+		Success: true,
+		Data:    cart,
+	}
+
+	return successResponse, nil
+}
+
 func (s *ShoppingCartService) AddItemToCart(item *domain.ShoppingCartItem) (*response.SuccessResponse, *response.ErrorResponse) {
 	if err := s.validator.Struct(item); err != nil {
 		s.logger.WithError(err).Error("Validation failed for quantity")
