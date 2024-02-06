@@ -33,6 +33,9 @@ docker-compose up --build
 
 The project will run at http://localhost:3000.
 
+## Documentation
+https://documenter.getpostman.com/view/6768805/2s9YywfKou
+
 ## Available Endpoints
 
 - **GET /products**: Retrieve a list of all products.
